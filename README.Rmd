@@ -1,0 +1,40 @@
+---
+title: "EngeMetadata package template setup"
+author: "Jason T. Serviss"
+date: "`r Sys.Date()`"
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+All instructions herein are case sensitive and tense specific, i.e. "Well" is 
+not the same as "well" and "Well" is not the same as "Wells".
+
+### Workbook
+* Must include 3 sheets named "Plate", "Columns", and "Wells". Note that the 
+names are plural.
+
+### Plate sheet
+* Should only contain 2 columns named "Key" and "Value".
+* The unique_key key is mandatory and should match the file name.
+* The wells_in_plate key is mandatory. Possible values are 384 or 96.
+
+### Columns sheet
+* The Column key is mandatory. Note that this is singular.
+* The Column key values must include all columns present in the plate type given
+by the wells_in_plate key in the Plate sheet. Single digit columns should be 
+prefixed with a 0, i.e. "01" not "1".
+
+### Wells sheet
+* The Well key is mandatory. Note that this is singular.
+* The Well key values must include all wells in the plate type given by the 
+wells_in_plate key in the Plate sheet. Single digit columns should be prefixed 
+with a 0, i.e. "A01" not "A1".
+
+### Dates
+* Dates are expected to have the word "date" somewhere in the key.
+* Dates including a month or day that is a single digit should be prefixed with
+a "0", i.e. "01" for January and not "1" likewise "01" for the first of the 
+month not "1".
+* Dates should be formatted year, month, day without spaces. Acceptable syntax 
+is: 20181201 or 181201.
