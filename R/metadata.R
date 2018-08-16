@@ -108,7 +108,7 @@ NULL
 #' @importFrom stringr str_detect
 
 getPlateMeta <- function(
-  plate, path = 'Enge_lab/GFP_mouse/Annotation/package_testing'
+  plate, path = 'data/package_testing/'
 ){
   files <- pull(drive_ls(path = path), name)
   if(!plate %in% files) stop(paste0(plate, " not found on Google Drive."))
