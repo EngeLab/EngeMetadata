@@ -3,6 +3,12 @@ EngeMetadata package template setup
 Jason T. Serviss
 2018-08-16
 
+Release build:
+<a href="https://travis-ci.org/EngeLab/EngelabMetadata"><img src="https://travis-ci.com/EngeLab/EngelabMetadata.svg?token=8VXNvJpmRV9RpFtTcJYW&branch=master"></a>
+
+Test coverage: [![Coverage
+status](https://codecov.io/gh/EngeLab/EngelabMetadata/branch/master/graph/badge.svg?token=vVxKKSzhGt)](https://codecov.io/gh/EngeLab/EngelabMetadata)
+
 All instructions herein are case sensitive and tense specific, i.e.
 “Well” is not the same as “well” and “Well” is not the same as
 “Wells”.
