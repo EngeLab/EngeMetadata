@@ -103,8 +103,9 @@ NULL
 #' @importFrom dplyr pull
 #' @importFrom googledrive drive_ls drive_download
 #' @importFrom purrr map
-#' @importFrom readxl read_excel
+#' @importFrom readxl read_excel excel_sheets
 #' @importFrom tidyr spread
+#' @importFrom stringr str_detect
 
 getPlateMeta <- function(
   plate, path = 'Enge_lab/GFP_mouse/Annotation/package_testing'
