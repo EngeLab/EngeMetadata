@@ -12,3 +12,9 @@ r_check_args: "--timings"
   - linux
   - osx
   - windows
+
+r_packages:
+  - covr
+
+after_success:
+  - Rscript -e 'library(covr); codecov()'
