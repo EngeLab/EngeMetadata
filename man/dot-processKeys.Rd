@@ -10,7 +10,7 @@
 A character vector of the duplicated keys without their suffix.
 }
 \description{
-Helper for \code{\link{resolvePlateMeta}}.Extracts duplicated key names with
+Helper for \code{\link{resolvePlateMeta}}. Extracts duplicated key names with
 a ".x" or ".y" suffix.
 }
 \author{

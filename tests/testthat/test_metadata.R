@@ -1,6 +1,4 @@
-context("metadata")
-
-load(system.file('tests/testthat/test-files/test1.rda', package = "EngeMetadata"))
+context("testDatadata")
 
 test_that("check that .processKeys outputs the expected result", {
   expect_identical(.processKeys(c("A.x", "A.y")), "A")
@@ -12,11 +10,11 @@ test_that("check that .layout outputs the expected result", {
 
 test_that("check that .resolve works with nothing to resolve", {
   #setup input data
-  wells <- pull(meta[[3]], wells_in_plate)
+  wells <- pull(testData[[3]], wells_in_plate)
   layout <- .layout(wells)
-  base <- map_dfr(1:nrow(layout), function(x) meta[[3]]) %>%
+  base <- map_dfr(1:nrow(layout), function(x) testData[[3]]) %>%
     bind_cols(layout, .)
-  bind1 <- full_join(base, meta[[2]], by = "Column")
+  bind1 <- full_join(base, testData[[2]], by = "Column")
   keys1 <- .processKeys(colnames(bind1))
   
   
@@ -32,12 +30,12 @@ test_that("check that .resolve works with nothing to resolve", {
 
 test_that("check that .resolve works with something to resolve", {
   #setup input data
-  wells <- pull(meta[[3]], wells_in_plate)
+  wells <- pull(testData[[3]], wells_in_plate)
   layout <- .layout(wells)
-  base <- map_dfr(1:nrow(layout), function(x) meta[[3]]) %>%
+  base <- map_dfr(1:nrow(layout), function(x) testData[[3]]) %>%
     bind_cols(layout, .)
-  resolved1 <- full_join(base, meta[[2]], by = "Column")
-  bind2 <- full_join(resolved1, meta[[1]], by = "Well")
+  resolved1 <- full_join(base, testData[[2]], by = "Column")
+  bind2 <- full_join(resolved1, testData[[1]], by = "Well")
   keys2 <- .processKeys(colnames(bind2))
   
   #expected

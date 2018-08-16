@@ -1,4 +1,4 @@
 library(testthat)
-library(metaData)
+library(EngeMetadata)
 
-test_check("metaData")
+test_check("EngeMetadata")

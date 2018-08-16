@@ -40,6 +40,8 @@ metadata <- function(
 NULL
 
 checkMeta <- function(meta) {
+  unique_key <- NULL; wells_in_plate <- NULL
+  
   #check that unique_key exists
   if(!"unique_key" %in% colnames(meta[[3]])) {
     stop("unique_key key is missing from Plate sheet.")
@@ -110,6 +112,8 @@ NULL
 getPlateMeta <- function(
   plate, path = 'data/package_testing/'
 ){
+  Key <- NULL; Value <- NULL; name <- NULL
+  
   files <- pull(drive_ls(path = path), name)
   if(!plate %in% files) stop(paste0(plate, " not found on Google Drive."))
 
@@ -136,17 +140,34 @@ getPlateMeta <- function(
   names(meta) <- rep(plate, 3)
   
   #format dates
-  .dates(meta)
+  .datesFormat(meta)
 }
 
-.dates <- function(meta) {
+#' .datesFormat
+#'
+#' Date formatting helper to \code{\link{getPlateMeta}}.
+#'
+#' @name .datesFormat
+#' @keywords internal
+#' @rdname dot-datesFormat
+#' @param meta Output from \code{\link{getPlateMeta}} function.
+#' @return List of tibbles with ymd formatted dates.
+#' @author Jason Serviss
+NULL
+#' @importFrom lubridate ymd
+#' @importFrom purrr map map2
+#' @importFrom stringr str_detect
+#' @importFrom dplyr mutate sym
+#' @importFrom rlang ":=" "!!"
+
+.datesFormat <- function(meta) {
   dateCols <- map(meta, function(d) {
     colnames(d)[str_detect(colnames(d), "date")]
   })
   
   map2(meta, dateCols, function(x, y) {
     if(length(y) == 0) {x} else {
-      mutate(x, !! y := lubridate::ymd(!! dplyr::sym(y)))
+      mutate(x, !! y := ymd(!! dplyr::sym(y)))
     }
   })
 }
@@ -164,10 +185,12 @@ getPlateMeta <- function(
 #' @return A tibble with the resolved metadata.
 #' @author Jason Serviss
 NULL
-#' @importFrom dplyr pull bind_cols full_join select matches
+#' @importFrom dplyr pull bind_cols full_join select matches "%>%"
 #' @importFrom purrr map_dfr map_dfc
 
 resolvePlateMeta <- function(meta) {
+  wells_in_plate <- NULL
+  
   #layout plate
   wells <- pull(meta[[3]], wells_in_plate)
   layout <- .layout(wells)
@@ -195,7 +218,7 @@ resolvePlateMeta <- function(meta) {
 
 #' .processKeys
 #'
-#' Helper for \code{\link{resolvePlateMeta}}.Extracts duplicated key names with
+#' Helper for \code{\link{resolvePlateMeta}}. Extracts duplicated key names with
 #' a ".x" or ".y" suffix.
 #'
 #' @name .processKeys
@@ -225,7 +248,7 @@ NULL
 #' @return A character vector of the duplicated keys without their suffix.
 #' @author Jason Serviss
 NULL
-#' @importFrom dplyr select mutate sym
+#' @importFrom dplyr select mutate sym "%>%"
 #' @importFrom rlang ":=" "!!"
 #' @importFrom purrr map2
 #' @importFrom tidyr unnest
@@ -262,6 +285,8 @@ NULL
 #' @importFrom tibble tibble is_tibble
 
 .layout <- function(format) {
+  Row <- NULL; Column <- NULL; Well <- NULL
+  
   if(format == 384) {
     r <- LETTERS[1:16]
     c <- c(paste0("0", 1:9), 10:24)
