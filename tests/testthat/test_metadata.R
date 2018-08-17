@@ -152,7 +152,9 @@ test_that("check that getPlateMeta outputs the expected result", {
   expect_identical(length(output), 3L)
 })
 
-test_that("check that getPlateMeta outputs the expected result", {
+test_that("check that .safe2 errors when expected", {
   p <- system.file("testdata/test1.xlsx", package = "EngeMetadata")
   expect_silent(.safe2(p))
+  p <- system.file("testdata/test2.xlsx", package = "EngeMetadata")
+  expect_error(.safe2(p))
 })
