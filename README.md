@@ -1,10 +1,10 @@
 EngeMetadata package template setup
 ================
 Jason T. Serviss
-2018-08-16
+2018-08-17
 
 Release build:
-<a href="https://travis-ci.org/EngeLab/EngelabMetadata"><img src="https://travis-ci.org/EngeLab/EngeMetadata.svg?branch=master"></a>
+<a href="https://travis-ci.org/EngeLab/EngeMetadata"><img src="https://travis-ci.org/EngeLab/EngeMetadata.svg?branch=master"></a>
 
 Test coverage:
 [![codecov](https://codecov.io/gh/EngeLab/EngeMetadata/branch/master/graph/badge.svg)](https://codecov.io/gh/EngeLab/EngeMetadata)
