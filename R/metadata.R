@@ -19,9 +19,10 @@ NULL
 
 metadata <- function(
   plate,
-  path = 'Enge_lab/GFP_mouse/Annotation/package_testing'
+  path = 'data/package_testing/',
+  verbose = FALSE
 ){
-  meta <- getPlateMeta(plate, path)
+  meta <- getPlateMeta(plate, path, verbose)
   checkMeta(meta)
   resolvePlateMeta(meta)
 }
@@ -110,7 +111,7 @@ NULL
 #' @importFrom stringr str_detect
 
 getPlateMeta <- function(
-  plate, path = 'data/package_testing/'
+  plate, path = 'data/package_testing/', verbose
 ){
   Key <- NULL; Value <- NULL; name <- NULL
   
@@ -121,7 +122,7 @@ getPlateMeta <- function(
   tmp <- tempdir()
   p <- file.path(tmp, paste0(plate, ".xlsx"))
   drive_download(
-    plate, path = p, overwrite = TRUE
+    plate, path = p, overwrite = TRUE, verbose = verbose
   )
   
   if(!all(c("Plate", "Columns", "Wells") %in% excel_sheets(p))) {

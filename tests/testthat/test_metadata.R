@@ -64,3 +64,36 @@ test_that("check that .resolve works with something to resolve", {
   expect_identical(unname(output.oc[3]), expected.oc.Z)
   expect_identical(unname(output.oc[4]), expected.oc.NA)
 })
+
+test_that("check that metadata is error and warning free", {
+  expect_silent(metadata('test1'))
+})
+
+test_that("check that checkMeta errors when expected", {
+  #check that unique_key exists
+  tmp <- list(testData[[1]], testData[[2]], select(testData[[3]], -unique_key))
+  expect_error(checkMeta(tmp), regexp = "unique_key key is missing from Plate sheet.")
+  
+  #check that file name matches unique key
+  tmp <- testData
+  names(tmp) <- rep("A", length(tmp))
+  expect_error(checkMeta(tmp), regexp = "File name and unique_key do not match.")
+  
+  #check that the wells_in_plate variable is present in the Plate sheet
+  tmp <- list(testData[[1]], testData[[2]], select(testData[[3]], -wells_in_plate))
+  names(tmp) <- rep("test1", 3)
+  expect_error(checkMeta(tmp), regexp = "wells_in_plate key missing from Plate sheet")
+  
+  #check that wells_in_plate is wither 384 or 96
+  tmp <- list(testData[[1]], testData[[2]], mutate(testData[[3]], wells_in_plate = 12))
+  names(tmp) <- rep("test1", 3)
+  expect_error(checkMeta(tmp), "wells_in_plate key must equal 384 or 96")
+  
+  #check that the Column key in the Columns sheet is present.
+  tmp <- list(testData[[1]], select(testData[[2]], -Column), testData[[3]])
+  names(tmp) <- rep("test1", 3)
+  expect_error(checkMeta(tmp), regexp = "The Column key in the Columns sheet is missing.")
+  
+})
+
+
