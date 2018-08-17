@@ -27,68 +27,6 @@ metadata <- function(
   resolvePlateMeta(meta)
 }
 
-#' checkMeta
-#'
-#' Checks that assumptions concerning the metadata in Google Drive are fufilled.
-#'
-#' @name checkMeta
-#' @keywords internal
-#' @rdname checkMeta
-#' @param meta List; Length 3 list with the Wells, Columns, and Plate sheets,
-#' respectivley.
-#' @return Nothing.
-#' @author Jason Serviss
-NULL
-
-checkMeta <- function(meta) {
-  unique_key <- NULL; wells_in_plate <- NULL
-  
-  #check that unique_key exists
-  if(!"unique_key" %in% colnames(meta[[3]])) {
-    stop("unique_key key is missing from Plate sheet.")
-  }
-  #check that file name matches unique key
-  if(unique(names(meta)) != pull(meta[[3]], unique_key)) {
-    stop("File name and unique_key do not match.")
-  }
-  #check that the wells_in_plate variable is present in the Plate sheet
-  if(!"wells_in_plate" %in% colnames(meta[[3]])) {
-    stop("wells_in_plate key missing from Plate sheet")
-  }
-  #check that wells_in_plate is wither 384 or 96
-  if(!pull(meta[[3]], wells_in_plate) %in% c(384, 96)) {
-    stop("wells_in_plate key must equal 384 or 96")
-  }
-  #check that the Column key in the Columns sheet is present.
-  if(!"Column" %in% colnames(meta[[2]])) {
-    stop("The Column key in the Columns sheet is missing.")
-  }
-  #check that the Column key in the Columns sheet is correct.
-  wells <- pull(meta[[3]], wells_in_plate)
-  if(!identical(unique(.layout(wells)$Column), meta[[2]]$Column)) {
-    mess <- paste0(
-      "The Column key in the Columns sheet is malformated. ", 
-      "The plate format is: ", wells,
-      " so Column should contain: ", 
-      paste(unique(.layout(wells)$Column), collapse = ", ")
-    )
-    stop(mess)
-  }
-  #check that the Wells key in the Wells sheet is present.
-  if(!"Well" %in% colnames(meta[[1]])) {
-    stop("The Wells key in the Wells sheet is missing.")
-  }
-  #check that the Wells key in the Wells sheet is correct.
-  if(!identical(.layout(wells)$Well, meta[[1]]$Well)) {
-    mess <- paste0(
-      "The Well key in the Wells sheet is malformated. ", 
-      "The plate format is ", wells,
-      " so Well should contain: ", paste(.layout(wells)$Well, collapse = ", ")
-    )
-    stop(mess)
-  }
-}
-
 #' getPlateMeta
 #'
 #' Downloads and reads the metadata into R.
@@ -171,6 +109,68 @@ NULL
       mutate(x, !! y := ymd(!! dplyr::sym(y)))
     }
   })
+}
+
+#' checkMeta
+#'
+#' Checks that assumptions concerning the metadata in Google Drive are fufilled.
+#'
+#' @name checkMeta
+#' @keywords internal
+#' @rdname checkMeta
+#' @param meta List; Length 3 list with the Wells, Columns, and Plate sheets,
+#' respectivley.
+#' @return Nothing.
+#' @author Jason Serviss
+NULL
+
+checkMeta <- function(meta) {
+  unique_key <- NULL; wells_in_plate <- NULL
+  
+  #check that unique_key exists
+  if(!"unique_key" %in% colnames(meta[[3]])) {
+    stop("unique_key key is missing from Plate sheet.")
+  }
+  #check that file name matches unique key
+  if(unique(names(meta)) != pull(meta[[3]], unique_key)) {
+    stop("File name and unique_key do not match.")
+  }
+  #check that the wells_in_plate variable is present in the Plate sheet
+  if(!"wells_in_plate" %in% colnames(meta[[3]])) {
+    stop("wells_in_plate key missing from Plate sheet")
+  }
+  #check that wells_in_plate is wither 384 or 96
+  if(!pull(meta[[3]], wells_in_plate) %in% c(384, 96)) {
+    stop("wells_in_plate key must equal 384 or 96")
+  }
+  #check that the Column key in the Columns sheet is present.
+  if(!"Column" %in% colnames(meta[[2]])) {
+    stop("The Column key in the Columns sheet is missing.")
+  }
+  #check that the Column key in the Columns sheet is correct.
+  wells <- pull(meta[[3]], wells_in_plate)
+  if(!identical(unique(.layout(wells)$Column), meta[[2]]$Column)) {
+    mess <- paste0(
+      "The Column key in the Columns sheet is malformated. ", 
+      "The plate format is: ", wells,
+      " so Column should contain: ", 
+      paste(unique(.layout(wells)$Column), collapse = ", ")
+    )
+    stop(mess)
+  }
+  #check that the Well key in the Wells sheet is present.
+  if(!"Well" %in% colnames(meta[[1]])) {
+    stop("The Well key in the Wells sheet is missing.")
+  }
+  #check that the Wells key in the Wells sheet is correct.
+  if(!identical(.layout(wells)$Well, meta[[1]]$Well)) {
+    mess <- paste0(
+      "The Well key in the Wells sheet is malformated. ", 
+      "The plate format is ", wells,
+      " so Well should contain: ", paste(.layout(wells)$Well, collapse = ", ")
+    )
+    stop(mess)
+  }
 }
 
 #' resolvePlateMeta

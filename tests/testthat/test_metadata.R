@@ -89,6 +89,21 @@ test_that("check that checkMeta errors when expected", {
   names(tmp) <- rep("test1", 3)
   expect_error(checkMeta(tmp), regexp = "The Column key in the Columns sheet is missing.")
   
+  #check that the Column key in the Columns sheet is correct.
+  tmp <- list(testData[[1]], mutate(testData[[2]], Column = c(NA, Column[-1])), testData[[3]])
+  names(tmp) <- rep("test1", 3)
+  expect_error(checkMeta(tmp), regexp = "The Column key in the Columns sheet is malformated.*")
+  
+  #check that the Well key in the Wells sheet is present.
+  tmp <- list(select(testData[[1]], -Well), testData[[2]], testData[[3]])
+  names(tmp) <- rep("test1", 3)
+  expect_error(checkMeta(tmp), regexp = "The Well key in the Wells sheet is missing.")
+  
+  #check that the Wells key in the Wells sheet is correct.
+  tmp <- list(mutate(testData[[1]], Well = c(NA, Well[-1])), testData[[2]], testData[[3]])
+  names(tmp) <- rep("test1", 3)
+  expect_error(checkMeta(tmp), regexp = "The Well key in the Wells sheet is malformated.*")
+  
 })
 
 
