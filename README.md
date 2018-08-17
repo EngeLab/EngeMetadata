@@ -1,17 +1,23 @@
-EngeMetadata package template setup
+EngeMetadata package
 ================
 Jason T. Serviss
 2018-08-17
 
 Release build:
 <a href="https://travis-ci.org/EngeLab/EngeMetadata"><img src="https://travis-ci.org/EngeLab/EngeMetadata.svg?branch=master"></a>
-
 Test coverage:
 [![codecov](https://codecov.io/gh/EngeLab/EngeMetadata/branch/master/graph/badge.svg)](https://codecov.io/gh/EngeLab/EngeMetadata)
 
 All instructions herein are case sensitive and tense specific, i.e.
 “Well” is not the same as “well” and “Well” is not the same as
 “Wells”.
+
+## Template setup
+
+The template design is based on sheet precedence with Wells \> Columns
+\> Plate. This means e.g. if a key is present in the Plate sheet and
+also present in Columns sheet, the values in the Columns sheet will
+overwrite the values in the Plate sheet where they differ.
 
 ### Workbook
 
@@ -47,3 +53,11 @@ All instructions herein are case sensitive and tense specific, i.e.
     for the first of the month not “1”.
   - Dates should be formatted year, month, day without spaces.
     Acceptable syntax is: 20181201 or 181201.
+
+## Importing metadata into R
+
+There is currently only one exported function in the package which is
+called “metadata”. The metadata function takes a plate/file name and a
+googledrive path as arguments and downloads, processes, and returns the
+metadata as a tibble. Precedence is resolved automatically and the
+metadata is expanded so that there is one entry per sample.
