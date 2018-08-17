@@ -8,11 +8,20 @@ Release build:
 Test coverage:
 [![codecov](https://codecov.io/gh/EngeLab/EngeMetadata/branch/master/graph/badge.svg)](https://codecov.io/gh/EngeLab/EngeMetadata)
 
+## Installation
+
+``` r
+if(!"devtools" %in% rownames(installed.packages())) {
+  install.packages("devtools")
+}
+devtools::install_github("EngeLab/EngeMetadata")
+```
+
+## Template setup
+
 All instructions herein are case sensitive and tense specific, i.e.
 “Well” is not the same as “well” and “Well” is not the same as
 “Wells”.
-
-## Template setup
 
 The template design is based on sheet precedence with Wells \> Columns
 \> Plate. This means e.g. if a key is present in the Plate sheet and
