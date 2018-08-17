@@ -6,6 +6,7 @@ test_that("check that .processKeys outputs the expected result", {
 
 test_that("check that .layout outputs the expected result", {
   expect_true(is_tibble(.layout(384)))
+  expect_true(is_tibble(.layout(96)))
 })
 
 test_that("check that .resolve works with nothing to resolve", {
@@ -62,6 +63,8 @@ test_that("check that .resolve works with something to resolve", {
   expect_identical(unname(output.oc[2]), expected.oc.Y)
   expect_identical(unname(output.oc[3]), expected.oc.Z)
   expect_identical(unname(output.oc[4]), expected.oc.NA)
+  
+  expect_identical(.resolve(bind2, list()), bind2)
 })
 
 test_that("check that checkMeta errors when expected", {
@@ -103,7 +106,36 @@ test_that("check that checkMeta errors when expected", {
   tmp <- list(mutate(testData[[1]], Well = c(NA, Well[-1])), testData[[2]], testData[[3]])
   names(tmp) <- rep("test1", 3)
   expect_error(checkMeta(tmp), regexp = "The Well key in the Wells sheet is malformated.*")
-  
 })
 
+test_that("check that .datesFormat outputs the expected result", {
+  expect_is(pull(testData[[3]], sample_recieve_date), "Date")
+  
+  #no date present
+  tmp <- list(testData[[1]], testData[[2]], select(testData[[3]], -sample_recieve_date))
+  expect_identical(tmp, .datesFormat(tmp))
+  
+  #malformatted dates
+  tmp <- list(testData[[1]], testData[[2]], mutate(testData[[3]], sample_recieve_date = "2018102"))
+  expect_warning(.datesFormat(tmp))
+  
+  tmp <- list(testData[[1]], testData[[2]], mutate(testData[[3]], sample_recieve_date = "2018-20-02"))
+  expect_warning(.datesFormat(tmp))
+})
 
+test_that("check that resolvePlateMeta outputs the expected result", {
+  output <- resolvePlateMeta(testData)
+  expect_true(is.tibble(output))
+  
+  #check that all conflicts are resolved
+  expect_false(all(str_detect(colnames(output), "\\.x$")))
+  expect_false(all(str_detect(colnames(output), "\\.y$")))
+  
+  #check all columns present
+  expected <- map(testData, colnames) %>% unlist() %>% unique()
+  expect_true(all(expected %in% colnames(output)))
+  
+  #check dimensions
+  expect_identical(nrow(output), 384L)
+  expect_identical(ncol(output), 15L)
+})

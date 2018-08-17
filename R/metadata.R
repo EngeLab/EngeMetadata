@@ -37,6 +37,7 @@ metadata <- function(
 #' @param plate Character; Corresponds to the plate to process metadata for.
 #' Must correspond to a file name in the path argument.
 #' @param path Character; The location of the plate metadata on Google Drive.
+#' @param verbose Logical; Indicates if function should be verbose.
 #' @return List; Length 3 list with the Wells, Columns, and Plate sheets,
 #' respectivley.
 #' @author Jason Serviss
@@ -51,8 +52,8 @@ NULL
 getPlateMeta <- function(
   plate, path = 'data/package_testing/', verbose
 ){
-  Key <- NULL; Value <- NULL; name <- NULL
   
+  Key <- NULL; Value <- NULL; name <- NULL
   files <- pull(drive_ls(path = path), name)
   if(!plate %in% files) stop(paste0(plate, " not found on Google Drive."))
 
@@ -205,14 +206,14 @@ resolvePlateMeta <- function(meta) {
   keys1 <- .processKeys(colnames(bind1))
   add1 <- map_dfc(keys1,  ~.resolve(bind1, .x))
   full1 <- bind_cols(bind1, add1)
-  resolved1 <- select(full1, -matches("\\.[x-y]"))
+  resolved1 <- select(full1, -(dplyr::matches("\\.[x-y]")))
 
   #resolve Well and combined Plate and Column prescedence
   bind2 <- full_join(resolved1, meta[[1]], by = "Well")
   keys2 <- .processKeys(colnames(bind2))
   add2 <- map_dfc(keys2,  ~.resolve(bind2, .x))
   full2 <- bind_cols(bind2, add2)
-  resolved2 <- select(full2, -matches("\\.[x-y]"))
+  resolved2 <- select(full2, -(dplyr::matches("\\.[x-y]")))
 
   return(resolved2)
 }
