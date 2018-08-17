@@ -189,6 +189,7 @@ checkMeta <- function(meta) {
 NULL
 #' @importFrom dplyr pull bind_cols full_join select matches "%>%"
 #' @importFrom purrr map_dfr map_dfc
+#' @importFrom tibble is_tibble
 
 resolvePlateMeta <- function(meta) {
   wells_in_plate <- NULL

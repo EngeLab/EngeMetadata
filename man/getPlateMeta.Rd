@@ -8,6 +8,8 @@
 Must correspond to a file name in the path argument.}
 
 \item{path}{Character; The location of the plate metadata on Google Drive.}
+
+\item{verbose}{Logical; Indicates if function should be verbose.}
 }
 \value{
 List; Length 3 list with the Wells, Columns, and Plate sheets,

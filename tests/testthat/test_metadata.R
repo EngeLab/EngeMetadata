@@ -125,7 +125,7 @@ test_that("check that .datesFormat outputs the expected result", {
 
 test_that("check that resolvePlateMeta outputs the expected result", {
   output <- resolvePlateMeta(testData)
-  expect_true(is.tibble(output))
+  expect_true(is_tibble(output))
   
   #check that all conflicts are resolved
   expect_false(all(str_detect(colnames(output), "\\.x$")))
