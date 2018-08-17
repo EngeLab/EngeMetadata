@@ -141,8 +141,9 @@ test_that("check that resolvePlateMeta outputs the expected result", {
 })
 
 test_that("check that getPlateMeta outputs the expected result", {
+  p <- system.file("testdata/test1.xlsx", package = "EngeMetadata")
   output <- getPlateMeta(
-    plate = "test1", path = '../../inst/rawdata/test1.xlsx', verbose = FALSE, 
+    plate = "test1", path = p, verbose = FALSE,
     safe = FALSE, local = TRUE
   )
   expect_is(output, "list")
@@ -152,5 +153,6 @@ test_that("check that getPlateMeta outputs the expected result", {
 })
 
 test_that("check that getPlateMeta outputs the expected result", {
-  expect_silent(.safe2('../../inst/rawdata/test1.xlsx'))
+  p <- system.file("testdata/test1.xlsx", package = "EngeMetadata")
+  expect_silent(.safe2(p))
 })
