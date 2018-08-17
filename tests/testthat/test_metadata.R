@@ -17,7 +17,6 @@ test_that("check that .resolve works with nothing to resolve", {
   bind1 <- full_join(base, testData[[2]], by = "Column")
   keys1 <- .processKeys(colnames(bind1))
   
-  
   #expected
   expected <- data.frame()
   
@@ -63,10 +62,6 @@ test_that("check that .resolve works with something to resolve", {
   expect_identical(unname(output.oc[2]), expected.oc.Y)
   expect_identical(unname(output.oc[3]), expected.oc.Z)
   expect_identical(unname(output.oc[4]), expected.oc.NA)
-})
-
-test_that("check that metadata is error and warning free", {
-  expect_silent(metadata('test1'))
 })
 
 test_that("check that checkMeta errors when expected", {
