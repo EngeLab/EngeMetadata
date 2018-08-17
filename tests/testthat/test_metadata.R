@@ -1,4 +1,4 @@
-context("testDatadata")
+context("metadata")
 
 test_that("check that .processKeys outputs the expected result", {
   expect_identical(.processKeys(c("A.x", "A.y")), "A")
@@ -138,4 +138,19 @@ test_that("check that resolvePlateMeta outputs the expected result", {
   #check dimensions
   expect_identical(nrow(output), 384L)
   expect_identical(ncol(output), 15L)
+})
+
+test_that("check that getPlateMeta outputs the expected result", {
+  output <- getPlateMeta(
+    plate = "test1", path = '../../inst/rawdata/test1.xlsx', verbose = FALSE, 
+    safe = FALSE, local = TRUE
+  )
+  expect_is(output, "list")
+  expect_identical(unique(names(output)), "test1")
+  expect_true(all(unlist(map(output, is_tibble))))
+  expect_identical(length(output), 3L)
+})
+
+test_that("check that getPlateMeta outputs the expected result", {
+  expect_silent(.safe2('../../inst/rawdata/test1.xlsx'))
 })

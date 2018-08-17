@@ -38,42 +38,38 @@ metadata <- function(
 #' Must correspond to a file name in the path argument.
 #' @param path Character; The location of the plate metadata on Google Drive.
 #' @param verbose Logical; Indicates if function should be verbose.
+#' @param safe Logical; for internal use.
+#' @param local Logical; for internal use. 
 #' @return List; Length 3 list with the Wells, Columns, and Plate sheets,
 #' respectivley.
 #' @author Jason Serviss
 NULL
-#' @importFrom dplyr pull
-#' @importFrom googledrive drive_ls drive_download
+#' @importFrom googledrive drive_download
 #' @importFrom purrr map
-#' @importFrom readxl read_excel excel_sheets
+#' @importFrom readxl read_excel
 #' @importFrom tidyr spread
 #' @importFrom stringr str_detect
+#' @importFrom rlang .data
 
 getPlateMeta <- function(
-  plate, path = 'data/package_testing/', verbose
+  plate, path = 'data/package_testing/', verbose, safe = TRUE, local = FALSE
 ){
-  
-  Key <- NULL; Value <- NULL; name <- NULL
-  files <- pull(drive_ls(path = path), name)
-  if(!plate %in% files) stop(paste0(plate, " not found on Google Drive."))
+  if(safe) .safe1(plate, path)
 
   #download plate data
-  tmp <- tempdir()
-  p <- file.path(tmp, paste0(plate, ".xlsx"))
-  drive_download(
-    plate, path = p, overwrite = TRUE, verbose = verbose
-  )
-  
-  if(!all(c("Plate", "Columns", "Wells") %in% excel_sheets(p))) {
-    s <- c("Plate", "Columns", "Wells")
-    missing <- s[which(!s %in% excel_sheets(p))]
-    stop(paste0(missing, " is not present in the sheets of plate ", p))
+  if(local) {
+    p <- path
+  } else {
+    p <- file.path(tempdir(), paste0(plate, ".xlsx"))
+    drive_download(plate, path = p, overwrite = TRUE, verbose = verbose)
   }
+  
+  if(safe) .safe2(p)
   
   #read and extract data
   meta <- map(c("Wells", "Columns", "Plate"), function(s) {
     d <- read_excel(path = p, sheet = s)
-    if(s == "Plate") d <- spread(d, Key, Value, convert = TRUE)
+    if(s == "Plate") d <- spread(d, .data$Key, .data$Value, convert = TRUE)
     d
   })
   
@@ -81,6 +77,47 @@ getPlateMeta <- function(
   
   #format dates
   .datesFormat(meta)
+}
+
+#' .safe1
+#'
+#' Checks for file on googledrive before attempting to download.
+#'
+#' @name .safe1
+#' @keywords internal
+#' @rdname dot-safe1
+#' @param plate Character; Corresponds to the plate to process metadata for.
+#' Must correspond to a file name in the path argument.
+#' @param path Character; The location of the plate metadata on Google Drive.
+#' @author Jason Serviss
+NULL
+#' @importFrom googledrive drive_ls
+#' @importFrom dplyr pull
+#' @importFrom rlang .data
+
+.safe1 <- function(plate, path) {
+  files <- pull(drive_ls(path = path), .data$name)
+  if(!plate %in% files) stop(paste0(plate, " not found on Google Drive."))
+}
+
+#' .safe2
+#'
+#' Checks that all sheets are present before loading the file.
+#'
+#' @name .safe2
+#' @keywords internal
+#' @rdname dot-safe2
+#' @param path Character; The location of the plate metadata locally.
+#' @author Jason Serviss
+NULL
+#' @importFrom readxl excel_sheets
+
+.safe2 <- function(path) {
+  if(!all(c("Plate", "Columns", "Wells") %in% excel_sheets(path))) {
+    s <- c("Plate", "Columns", "Wells")
+    missing <- s[which(!s %in% excel_sheets(path))]
+    stop(paste0(missing, " is not present in the sheets of plate ", path))
+  }
 }
 
 #' .datesFormat
@@ -124,16 +161,15 @@ NULL
 #' @return Nothing.
 #' @author Jason Serviss
 NULL
+#' @importFrom rlang .data
 
 checkMeta <- function(meta) {
-  unique_key <- NULL; wells_in_plate <- NULL
-  
   #check that unique_key exists
   if(!"unique_key" %in% colnames(meta[[3]])) {
     stop("unique_key key is missing from Plate sheet.")
   }
   #check that file name matches unique key
-  if(unique(names(meta)) != pull(meta[[3]], unique_key)) {
+  if(unique(names(meta)) != pull(meta[[3]], .data$unique_key)) {
     stop("File name and unique_key do not match.")
   }
   #check that the wells_in_plate variable is present in the Plate sheet
@@ -141,7 +177,7 @@ checkMeta <- function(meta) {
     stop("wells_in_plate key missing from Plate sheet")
   }
   #check that wells_in_plate is wither 384 or 96
-  if(!pull(meta[[3]], wells_in_plate) %in% c(384, 96)) {
+  if(!pull(meta[[3]], .data$wells_in_plate) %in% c(384, 96)) {
     stop("wells_in_plate key must equal 384 or 96")
   }
   #check that the Column key in the Columns sheet is present.
@@ -149,7 +185,7 @@ checkMeta <- function(meta) {
     stop("The Column key in the Columns sheet is missing.")
   }
   #check that the Column key in the Columns sheet is correct.
-  wells <- pull(meta[[3]], wells_in_plate)
+  wells <- pull(meta[[3]], .data$wells_in_plate)
   if(!identical(unique(.layout(wells)$Column), meta[[2]]$Column)) {
     mess <- paste0(
       "The Column key in the Columns sheet is malformated. ", 
@@ -190,12 +226,12 @@ NULL
 #' @importFrom dplyr pull bind_cols full_join select matches "%>%"
 #' @importFrom purrr map_dfr map_dfc
 #' @importFrom tibble is_tibble
+#' @importFrom rlang .data
 
 resolvePlateMeta <- function(meta) {
-  wells_in_plate <- NULL
   
   #layout plate
-  wells <- pull(meta[[3]], wells_in_plate)
+  wells <- pull(meta[[3]], .data$wells_in_plate)
   layout <- .layout(wells)
 
   #Add plate data to layout
