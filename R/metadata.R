@@ -250,9 +250,12 @@ resolvePlateMeta <- function(meta) {
   keys2 <- .processKeys(colnames(bind2))
   add2 <- map_dfc(keys2,  ~.resolve(bind2, .x))
   full2 <- bind_cols(bind2, add2)
-  resolved2 <- select(full2, -(dplyr::matches("\\.[x-y]")))
-
-  return(resolved2)
+  out <- select(full2, -(dplyr::matches("\\.[x-y]")))
+  
+  #remove missing wells
+  if("Missing" %in% colnames(out)) out <- filter(out, !Missing)
+  
+  return(out)
 }
 
 #' .processKeys

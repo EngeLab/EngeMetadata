@@ -1,7 +1,7 @@
 Package: EngeMetadata
 Type: Package
 Title: Handles R import of Google Drive based metadata for the Enge lab
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person("Jason T.", "Serviss", email = "Jason.serviss@ki.se", role = c("aut", "cre"), comment = c(ORCID = 0000-0002-5778-7014)),
     person("Martin", "Enge", email = "Martin.Enge@ki.se", role = c("aut"))
