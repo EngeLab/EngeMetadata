@@ -253,7 +253,11 @@ resolvePlateMeta <- function(meta) {
   out <- select(full2, -(dplyr::matches("\\.[x-y]")))
   
   #remove missing wells
-  if("Missing" %in% colnames(out)) out <- filter(out, !Missing)
+  if("Missing" %in% colnames(out)) {
+   out <- out %>%
+    filter(!Missing) %>%
+    select(-Missing)
+  }
   
   return(out)
 }
