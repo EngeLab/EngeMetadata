@@ -36,7 +36,13 @@ names are plural.
 ### Plate sheet
 * Should only contain 2 columns named "Key" and "Value".
 * The unique_key key is mandatory and should match the file name.
-* The wells_in_plate key is mandatory. Possible values are 384 or 96.
+* The wells_in_plate key is mandatory. Possible values are 384 or 96. More
+possibilities in _Adding non-standard metadata_ section.
+* Note that if the whole plate does not contain cells, this may be annotated 
+with the "Missing" key (in either the Columns or Wells sheet). If "Missing" is 
+given the value TRUE, it these samples will be removed from the metadata 
+downstream. Otherwise the whole plate, according to the wells_in_plate key, is 
+assumed to contain cells.
 
 ### Columns sheet
 * The Column key is mandatory. Note that this is singular.
@@ -64,4 +70,13 @@ There is currently only one exported function in the package which is called
 as arguments and downloads, processes, and returns the metadata as a tibble.
 Precedence is resolved automatically and the metadata is expanded so that there 
 is one entry per sample.
+
+## Adding non-standard metadata
+There is some limited functionality for adding metadata for non-standard 
+datasets, e.g. datasets produced by other labs that don't necessiarily conform
+well to the typical Enge lab setup. This can be achieved by substituting the 
+value in the wells_in_plate key for the number of samples and, in addition,
+removing all columns from the Columns sheet. The current setup only
+allows for metadata associated with an entire experiment or individual samples
+(which can be annotated in the wells sheet).
 

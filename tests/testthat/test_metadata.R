@@ -82,10 +82,10 @@ test_that("check that checkMeta errors when expected", {
   names(tmp) <- rep("test1", 3)
   expect_error(checkMeta(tmp), regexp = "wells_in_plate key missing from Plate sheet")
   
-  #check that wells_in_plate is wither 384 or 96
-  tmp <- list(testData[[1]], testData[[2]], mutate(testData[[3]], wells_in_plate = 12))
+  #check that wells_in_plate is numeric
+  tmp <- list(testData[[1]], testData[[2]], mutate(testData[[3]], wells_in_plate = "A"))
   names(tmp) <- rep("test1", 3)
-  expect_error(checkMeta(tmp), "wells_in_plate key must equal 384 or 96")
+  expect_error(checkMeta(tmp), "wells_in_plate key must equal 384 or 96 or be the number of samples")
   
   #check that the Column key in the Columns sheet is present.
   tmp <- list(testData[[1]], select(testData[[2]], -Column), testData[[3]])

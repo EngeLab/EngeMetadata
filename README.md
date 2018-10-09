@@ -1,7 +1,7 @@
 EngeMetadata package
 ================
 Jason T. Serviss
-2018-08-17
+2018-10-09
 
 Release build:
 <a href="https://travis-ci.org/EngeLab/EngeMetadata"><img src="https://travis-ci.org/EngeLab/EngeMetadata.svg?branch=master"></a>
@@ -38,7 +38,12 @@ overwrite the values in the Plate sheet where they differ.
   - Should only contain 2 columns named “Key” and “Value”.
   - The unique\_key key is mandatory and should match the file name.
   - The wells\_in\_plate key is mandatory. Possible values are 384 or
-    96.
+    96. More possibilities in *Adding non-standard metadata* section.
+  - Note that if the whole plate does not contain cells, this may be
+    annotated with the “Missing” key (in either the Columns or Wells
+    sheet). If “Missing” is given the value TRUE, it these samples will
+    be removed from the metadata downstream. Otherwise the whole plate,
+    according to the wells\_in\_plate key, is assumed to contain cells.
 
 ### Columns sheet
 
@@ -70,3 +75,14 @@ called “metadata”. The metadata function takes a plate/file name and a
 googledrive path as arguments and downloads, processes, and returns the
 metadata as a tibble. Precedence is resolved automatically and the
 metadata is expanded so that there is one entry per sample.
+
+## Adding non-standard metadata
+
+There is some limited functionality for adding metadata for non-standard
+datasets, e.g. datasets produced by other labs that don’t necessiarily
+conform well to the typical Enge lab setup. This can be achieved by
+substituting the value in the wells\_in\_plate key for the number of
+samples and, in addition, removing all columns from the Columns sheet.
+The current setup only allows for metadata associated with an entire
+experiment or individual samples (which can be annotated in the wells
+sheet).

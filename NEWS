@@ -1,2 +1,4 @@
+v0.1.2
+  * Adding support for non-standard metadata. See README.
 v0.1.1 
   * added functionality to remove all cells annotated with the Missing key = TRUE for plates that are not full

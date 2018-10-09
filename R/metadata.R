@@ -24,7 +24,8 @@ metadata <- function(
 ){
   meta <- getPlateMeta(plate, path, verbose)
   checkMeta(meta)
-  resolvePlateMeta(meta)
+  meta <- resolvePlateMeta(meta)
+  return(meta)
 }
 
 #' getPlateMeta
@@ -177,36 +178,41 @@ checkMeta <- function(meta) {
     stop("wells_in_plate key missing from Plate sheet")
   }
   #check that wells_in_plate is wither 384 or 96
-  if(!pull(meta[[3]], .data$wells_in_plate) %in% c(384, 96)) {
-    stop("wells_in_plate key must equal 384 or 96")
+  if(!is.numeric(pull(meta[[3]], .data$wells_in_plate))) {
+    stop("wells_in_plate key must equal 384 or 96 or be the number of samples")
   }
   #check that the Column key in the Columns sheet is present.
   if(!"Column" %in% colnames(meta[[2]])) {
     stop("The Column key in the Columns sheet is missing.")
   }
-  #check that the Column key in the Columns sheet is correct.
+  
+  #Only run column and well checks when the layout is 384 or 96
   wells <- pull(meta[[3]], .data$wells_in_plate)
-  if(!identical(unique(.layout(wells)$Column), meta[[2]]$Column)) {
-    mess <- paste0(
-      "The Column key in the Columns sheet is malformated. ", 
-      "The plate format is: ", wells,
-      " so Column should contain: ", 
-      paste(unique(.layout(wells)$Column), collapse = ", ")
-    )
-    stop(mess)
-  }
-  #check that the Well key in the Wells sheet is present.
-  if(!"Well" %in% colnames(meta[[1]])) {
-    stop("The Well key in the Wells sheet is missing.")
-  }
-  #check that the Wells key in the Wells sheet is correct.
-  if(!identical(.layout(wells)$Well, meta[[1]]$Well)) {
-    mess <- paste0(
-      "The Well key in the Wells sheet is malformated. ", 
-      "The plate format is ", wells,
-      " so Well should contain: ", paste(.layout(wells)$Well, collapse = ", ")
-    )
-    stop(mess)
+  if(wells %in% c(384, 96)) {
+    #check that the Column key in the Columns sheet is correct.
+    wells <- pull(meta[[3]], .data$wells_in_plate)
+    if(!identical(unique(.layout(wells)$Column), meta[[2]]$Column)) {
+      mess <- paste0(
+        "The Column key in the Columns sheet is malformated. ", 
+        "The plate format is: ", wells,
+        " so Column should contain: ", 
+        paste(unique(.layout(wells)$Column), collapse = ", ")
+      )
+      stop(mess)
+    }
+    #check that the Well key in the Wells sheet is present.
+    if(!"Well" %in% colnames(meta[[1]])) {
+      stop("The Well key in the Wells sheet is missing.")
+    }
+    #check that the Wells key in the Wells sheet is correct.
+    if(!identical(.layout(wells)$Well, meta[[1]]$Well)) {
+      mess <- paste0(
+        "The Well key in the Wells sheet is malformated. ", 
+        "The plate format is ", wells,
+        " so Well should contain: ", paste(.layout(wells)$Well, collapse = ", ")
+      )
+      stop(mess)
+    }
   }
 }
 
@@ -232,12 +238,16 @@ resolvePlateMeta <- function(meta) {
   
   #layout plate
   wells <- pull(meta[[3]], .data$wells_in_plate)
+  if(!wells %in% c(384, 96)) {
+    ns <- .handleNonstandardLayout(meta, wells)
+    return(ns)
+  }
   layout <- .layout(wells)
 
   #Add plate data to layout
   base <- map_dfr(1:nrow(layout), function(x) meta[[3]]) %>%
     bind_cols(layout, .)
-
+  
   #resolve Plate and Column prescedence
   bind1 <- full_join(base, meta[[2]], by = "Column")
   keys1 <- .processKeys(colnames(bind1))
@@ -252,14 +262,18 @@ resolvePlateMeta <- function(meta) {
   full2 <- bind_cols(bind2, add2)
   out <- select(full2, -(dplyr::matches("\\.[x-y]")))
   
-  #remove missing wells
-  if("Missing" %in% colnames(out)) {
-   out <- out %>%
-    filter(!Missing) %>%
-    select(-Missing)
-  }
-  
   return(out)
+}
+
+.handleNonstandardLayout <- function(meta, wells) {
+  if(length(meta[[2]]) != 0) {
+    stop("Column annotation detected in non-standard layout.")
+  }
+  base <- map_dfr(1:wells, function(x) meta[[3]])
+  if(length(meta[[1]]) == 0) {
+    return(base)
+  }
+  bind_cols(meta[[1]], base)
 }
 
 #' .processKeys
