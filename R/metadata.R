@@ -177,18 +177,18 @@ checkMeta <- function(meta) {
   if(!"wells_in_plate" %in% colnames(meta[[3]])) {
     stop("wells_in_plate key missing from Plate sheet")
   }
-  #check that wells_in_plate is wither 384 or 96
+  #check that wells_in_plate is numeric
   if(!is.numeric(pull(meta[[3]], .data$wells_in_plate))) {
     stop("wells_in_plate key must equal 384 or 96 or be the number of samples")
-  }
-  #check that the Column key in the Columns sheet is present.
-  if(!"Column" %in% colnames(meta[[2]])) {
-    stop("The Column key in the Columns sheet is missing.")
   }
   
   #Only run column and well checks when the layout is 384 or 96
   wells <- pull(meta[[3]], .data$wells_in_plate)
   if(wells %in% c(384, 96)) {
+    #check that the Column key in the Columns sheet is present.
+    if(!"Column" %in% colnames(meta[[2]])) {
+      stop("The Column key in the Columns sheet is missing.")
+    }
     #check that the Column key in the Columns sheet is correct.
     wells <- pull(meta[[3]], .data$wells_in_plate)
     if(!identical(unique(.layout(wells)$Column), meta[[2]]$Column)) {
