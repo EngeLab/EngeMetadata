@@ -10,6 +10,7 @@
 #' @param path Character; The location of the plate metadata on Google Drive.
 #' @return A tibble with the metadata specified in the file.
 #' @author Jason Serviss
+#' @author Martin Enge
 #' @examples
 #'
 #' \dontrun{metadata("test1", 'Enge_lab/GFP_mouse/Annotation/package_testing')}
@@ -20,9 +21,11 @@ NULL
 metadata <- function(
   plate,
   path = 'data/package_testing/',
-  verbose = FALSE
+  verbose = FALSE,
+  local = FALSE,
+  save.local = NULL
 ){
-  meta <- getPlateMeta(plate, path, verbose)
+  meta <- getPlateMeta(plate=plate, path=path, verbose=verbose, safe=TRUE, local=local, save.local=save.local)
   checkMeta(meta)
   meta <- resolvePlateMeta(meta)
   return(meta)
@@ -44,6 +47,7 @@ metadata <- function(
 #' @return List; Length 3 list with the Wells, Columns, and Plate sheets,
 #' respectivley.
 #' @author Jason Serviss
+#' @author Martin Enge
 NULL
 #' @importFrom googledrive drive_download
 #' @importFrom purrr map
@@ -53,16 +57,22 @@ NULL
 #' @importFrom rlang .data
 
 getPlateMeta <- function(
-  plate, path = 'data/package_testing/', verbose, safe = TRUE, local = FALSE
-){
-  if(safe) .safe1(plate, path)
-
+  plate, path = 'data/package_testing/', verbose=TRUE, safe = TRUE, local = FALSE, save.local=NULL
+  ){
+  plate_id <- plate
+  if(safe) {
+      plate_id <- .safe1(plate, path)
+  }
   #download plate data
   if(local) {
     p <- path
   } else {
-    p <- file.path(tempdir(), paste0(plate, ".xlsx"))
-    drive_download(plate, path = p, overwrite = TRUE, verbose = verbose)
+    if(!is.null(save.local)) {
+      p <- file.path(save.local, paste0(plate, ".xlsx"))
+    } else {
+      p <- file.path(tempdir(), paste0(plate, ".xlsx"))
+    }
+    drive_download(plate_id, path = p, overwrite = TRUE, verbose = verbose)
   }
   
   if(safe) .safe2(p)
@@ -97,8 +107,15 @@ NULL
 #' @importFrom rlang .data
 
 .safe1 <- function(plate, path) {
-  files <- pull(drive_ls(path = path), .data$name)
-  if(!plate %in% files) stop(paste0(plate, " not found on Google Drive."))
+    files <- drive_ls(path = path)
+    correctfile <- files$name %in% plate
+    if(sum(correctfile) == 0) {
+        stop(paste0(plate, " not found on Google Drive."))
+    }
+    if(sum(correctfile) > 1) {
+        stop(paste0("Multiple files called ", plate, " found on Google Drive directory."))
+    }
+    return(files[correctfile,])
 }
 
 #' .safe2
