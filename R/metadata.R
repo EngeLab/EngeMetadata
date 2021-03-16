@@ -346,7 +346,7 @@ NULL
       replace(y, is.na(y), x)
     })) %>%
     select(-key.x, -key.y) %>%
-    unnest()
+    unnest(cols=key)
 }
 
 #' .layout
