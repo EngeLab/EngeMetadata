@@ -262,21 +262,30 @@ resolvePlateMeta <- function(meta) {
   layout <- .layout(wells)
 
   #Add plate data to layout
-  base <- map_dfr(1:nrow(layout), function(x) meta[[3]]) %>%
-    bind_cols(layout, .)
-  
+  base <- layout
+  newmeta <- map_dfr(1:nrow(layout), function(x) meta[[3]])
+  if(length(newmeta) != 0) {
+    base <- bind_cols(base, newmeta)
+  }
+
   #resolve Plate and Column prescedence
   bind1 <- full_join(base, meta[[2]], by = "Column")
   keys1 <- .processKeys(colnames(bind1))
   add1 <- map_dfc(keys1,  ~.resolve(bind1, .x))
-  full1 <- bind_cols(bind1, add1)
+  full1 <- bind1
+  if(length(add1) != 0) {
+    full1 <- bind_cols(bind1, add1)
+  }
   resolved1 <- select(full1, -(dplyr::matches("\\.[x-y]")))
 
   #resolve Well and combined Plate and Column prescedence
   bind2 <- full_join(resolved1, meta[[1]], by = "Well")
   keys2 <- .processKeys(colnames(bind2))
   add2 <- map_dfc(keys2,  ~.resolve(bind2, .x))
-  full2 <- bind_cols(bind2, add2)
+  full2 <- bind2
+  if(length(add2) != 0) {
+    full2 <- bind_cols(bind2, add2)
+  }
   out <- select(full2, -(dplyr::matches("\\.[x-y]")))
   
   return(out)
